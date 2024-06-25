@@ -1,9 +1,11 @@
 # SPDX-FileCopyrightText: 2020-present Open Networking Foundation <info@opennetworking.org>
 #
 # SPDX-License-Identifier: Apache-2.0
+# Copyright 2024 Kyunghee University
 
 .PHONY: build
 
+TARGET := onos-api/go
 ONOS_PROTOC_VERSION := v1.3.0
 BUF_VERSION := 1.8.0
 
@@ -19,17 +21,17 @@ mod-lint: mod-update # @HELP ensure that the required dependencies are in place
 	# dependencies are vendored, but not committed, go.sum is the only thing we need to check
 	bash -c "diff -u <(echo -n) <(git diff go.sum)"
 
-golang: # @HELP compile Golang sources
+build: # @HELP compile Golang sources
 	cd go && go build ./...
 
 test: # @HELP run the unit tests and source code validation
 test: protos golang linters-go deps-go license
-	cd go && go test -race github.com/onosproject/onos-api/go/...
+	cd go && go test -race github.com/onosproject/${TARGET}/...
 
-jenkins-test: # @HELP run the unit tests and source code validation producing a junit style report for Jenkins
-jenkins-test: jenkins-tools test
-	export TEST_PACKAGES=github.com/onosproject/onos-api/go/... && cd go && ../build/build-tools/build/jenkins/make-unit
-	mv go/*.xml .
+#jenkins-test: # @HELP run the unit tests and source code validation producing a junit style report for Jenkins
+#jenkins-test: jenkins-tools test
+#	export TEST_PACKAGES=github.com/onosproject/${TARGET}/... && cd go && ../build/build-tools/build/jenkins/make-unit
+#	mv go/*.xml .
 
 deps-go: # @HELP ensure that the required dependencies are in place
 	cd go && go build -v ./...
@@ -60,8 +62,8 @@ publish: twine # @HELP publish version on github, dockerhub, abd PyPI
 	./build/build-tools/publish-version ${VERSION}
 	./build/build-tools/publish-version go/${VERSION}
 
-jenkins-publish: jenkins-tools # @HELP Jenkins calls this to publish artifacts
-	./build/build-tools/release-merge-commit
+#jenkins-publish: jenkins-tools # @HELP Jenkins calls this to publish artifacts
+#	./build/build-tools/release-merge-commit
 
 clean:: # @HELP remove all the build artifacts
 	rm -rf ./build/_output ./vendor
