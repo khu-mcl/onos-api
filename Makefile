@@ -25,11 +25,11 @@ mod-lint: mod-update # @HELP ensure that the required dependencies are in place
 	bash -c "diff -u <(echo -n) <(git diff go.sum)"
 
 build: # @HELP compile Golang sources
-	go build ./...
+	cd go && go build ./...
 
 test: # @HELP run the unit tests and source code validation
 test: protos golang linters-go deps-go license
-	go test -race github.com/onosproject/${TARGET}/...
+	cd go && go test -race github.com/onosproject/${TARGET}/...
 
 #jenkins-test: # @HELP run the unit tests and source code validation producing a junit style report for Jenkins
 #jenkins-test: jenkins-tools test
